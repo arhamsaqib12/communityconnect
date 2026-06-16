@@ -4,11 +4,13 @@ import Resource from "@/models/Resource";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   await connectDB();
 
-  const submission = await Submission.findById(params.id);
+  const { id } = await context.params;
+
+  const submission = await Submission.findById(id);
 
   if (!submission) {
     return Response.json(
@@ -17,7 +19,6 @@ export async function PATCH(
     );
   }
 
-  // Convert submission → resource
   const resource = await Resource.create({
     name: submission.name,
     category: submission.category,
